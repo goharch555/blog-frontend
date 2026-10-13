@@ -1,26 +1,26 @@
-# Use Node 16 for old CRA compatibility
-FROM node:16-alpine
+# ---------- Stage 1: build ----------
+# Node 16 for old CRA (react-scripts 4) compatibility
+FROM node:16-alpine AS build
 
-# Set working directory
 WORKDIR /app
 
-# Copy package files
+# Install dependencies (v1 jaisi layer, taa ke build cache reuse ho)
 COPY package*.json ./
+RUN npm ci
 
-# Install dependencies
-RUN npm install
-
-# Copy project files
+# Copy source and build static files
 COPY . .
-
-# Build app
 RUN npm run build
 
-# Install serve package
-RUN npm install -g serve
+# ---------- Stage 2: runtime ----------
+FROM nginx:1.28-alpine
 
-# Expose port
+# SPA config: unknown routes -> index.html (same as `serve -s`)
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Sirf build output copy karo, node_modules/source nahi
+COPY --from=build /app/build /usr/share/nginx/html
+
 EXPOSE 80
 
-# Run app
-CMD ["serve", "-s", "build", "-l", "80"]
+CMD ["nginx", "-g", "daemon off;"]
