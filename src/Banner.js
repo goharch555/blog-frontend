@@ -11,7 +11,7 @@ function Banner() {
         <div className="banner__blog">
           <p className="banner__category">Blog Category</p>
           <h1 className="banner__title">
-            Blog Title: Why Should We Do This For What Reasons Why Why
+            v4: Deployed by Gohar with Argo CD
           </h1>
           <p className="banner__body">
             A blog is a discussion or informational website published on the
